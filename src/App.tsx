@@ -160,6 +160,22 @@ export default function App() {
   // Admin login handler
   const handleAdminLogin = async (pin: string): Promise<boolean> => {
     const cleanPin = String(pin || '').trim();
+
+    // Instant validation for 281463 or current adminPin
+    if (cleanPin === '281463' || cleanPin === '1234' || cleanPin === state.eventConfig.adminPin) {
+      setIsAdminAuthenticated(true);
+      setAdminPinToken(cleanPin);
+      
+      // Async notify backend
+      fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: cleanPin }),
+      }).catch(() => {});
+
+      return true;
+    }
+
     try {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
@@ -174,12 +190,6 @@ export default function App() {
       }
     } catch (err) {
       console.warn('Login fallback error:', err);
-    }
-
-    if (cleanPin === '281463' || cleanPin === '1234' || cleanPin === state.eventConfig.adminPin) {
-      setIsAdminAuthenticated(true);
-      setAdminPinToken(cleanPin);
-      return true;
     }
 
     return false;

@@ -1,0 +1,571 @@
+{
+  "eventConfig": {
+    "hosts": "Karine",
+    "date": "28 de Novembro de 2026",
+    "time": "12:00",
+    "address": "R. B do Lot. Res. Célio Gurgel, 184 - Barroso",
+    "cityState": "Fortaleza - CE, 60863-362",
+    "mapsUrl": "https://maps.google.com/?q=R.+B+do+Lot.+Res.+Célio+Gurgel,+184+-+Barroso,+Fortaleza+-+CE,+60863-362",
+    "pixKey": "62357104376",
+    "pixName": "Karine",
+    "pixCity": "FORTALEZA",
+    "notes": "🍲 Comida: Teremos uma feijoada deliciosa por minha conta!\n🍻 Bebidas: Cada pessoa pode trazer sua bebida de preferência (teremos freezer liberado para gelar).\n🏊‍♀️ Lazer: Nossa festa terá piscina! Traga roupa de banho e venha se divertir!",
+    "adminPin": "281463"
+  },
+  "gifts": [
+    {
+      "id": "ut-1",
+      "name": "Jogo de panelas",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-2",
+      "name": "Panela de pressão",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-3",
+      "name": "Banho Maria",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-4",
+      "name": "Cuscuzeira grande",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-5",
+      "name": "Mine cuscuzeira",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-6",
+      "name": "Pipoqueira",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-7",
+      "name": "Chaleira",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-8",
+      "name": "Frigideira antiaderente pequena",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-9",
+      "name": "Frigideira antiaderente média",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-10",
+      "name": "Frigideira antiaderente grande",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-11",
+      "name": "Frigideira wok antiaderente",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-12",
+      "name": "Conjunto de frigideiras antiaderente",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-13",
+      "name": "Frigideira quadriovos antiaderente",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-14",
+      "name": "Jogo de facas para churrasco",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-15",
+      "name": "Jogo de talheres",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "ut-16",
+      "name": "Conjunto de conchas e espátulas",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-17",
+      "name": "Conjunto de colheres de pau silicone",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-18",
+      "name": "Conjunto de potes com tampa de vidro",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-19",
+      "name": "Conjunto de potes hermético",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-20",
+      "name": "Conjunto de jarra mais copos de vidro",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "ut-21",
+      "name": "Conjunto de pratos de vidro",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "ut-22",
+      "name": "Jogo de copos de vidro",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "ut-23",
+      "name": "Jogo de xícaras",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-24",
+      "name": "Porta tempeiros",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-25",
+      "name": "Conjunto de galheteiro",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-26",
+      "name": "Garrafa de café",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-27",
+      "name": "Aparelho de jantar",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-28",
+      "name": "Conjunto de sobremesa",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-29",
+      "name": "Conjunto de taças",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "ut-30",
+      "name": "Suqueira de vidro",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-31",
+      "name": "Petisqueira de vidro",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-32",
+      "name": "Moedor de tempero",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-33",
+      "name": "Moedor de pimenta",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-34",
+      "name": "Forma de silicone para Air fryer",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "ut-35",
+      "name": "Prato bolo de vidro",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ut-36",
+      "name": "Porta bolo de vidro",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-37",
+      "name": "Copo térmico",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ut-38",
+      "name": "Porta condimentos",
+      "category": "Utensílios de cozinha",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "cm-1",
+      "name": "Jogo de cama",
+      "category": "Cama",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "cm-2",
+      "name": "Lençóis",
+      "category": "Cama",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "cm-3",
+      "name": "Kit edredom",
+      "category": "Cama",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "cm-4",
+      "name": "Conjunto de travesseiro",
+      "category": "Cama",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "cm-5",
+      "name": "Cobertor",
+      "category": "Cama",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "cm-6",
+      "name": "Manta",
+      "category": "Cama",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "cm-7",
+      "name": "Protetor de colchão",
+      "category": "Cama",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "cm-8",
+      "name": "Rede",
+      "category": "Cama",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "bn-1",
+      "name": "Jogo de toalhas",
+      "category": "Banho",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "bn-2",
+      "name": "Toalha de banho",
+      "category": "Banho",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "bn-3",
+      "name": "Roupão",
+      "category": "Banho",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ms-1",
+      "name": "Jogo americano 6 lugares",
+      "category": "Mesa",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ms-2",
+      "name": "Conjunto suplat 6 lugares",
+      "category": "Mesa",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ms-3",
+      "name": "Toalha de mesa 6 lugares",
+      "category": "Mesa",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "ms-4",
+      "name": "Travessa de vidro",
+      "category": "Mesa",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "ms-5",
+      "name": "Saladeira",
+      "category": "Mesa",
+      "totalQuantity": 3,
+      "reservations": []
+    },
+    {
+      "id": "ms-6",
+      "name": "Conjunto de bowls",
+      "category": "Mesa",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "lv-1",
+      "name": "Varal de chão",
+      "category": "Lavanderia",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "lv-2",
+      "name": "Cesto para roupas",
+      "category": "Lavanderia",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "lv-3",
+      "name": "Mop",
+      "category": "Lavanderia",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "lv-4",
+      "name": "Organizador para produtos de limpeza",
+      "category": "Lavanderia",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "lv-5",
+      "name": "Lixeira com pedal",
+      "category": "Lavanderia",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ep-1",
+      "name": "Liquidificador",
+      "category": "Eletroportáteis",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ep-2",
+      "name": "Air fryer",
+      "category": "Eletroportáteis",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ep-3",
+      "name": "Sanduicheira",
+      "category": "Eletroportáteis",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ep-4",
+      "name": "Cafeteira",
+      "category": "Eletroportáteis",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ep-5",
+      "name": "Mixer",
+      "category": "Eletroportáteis",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ep-6",
+      "name": "Processador de alimentos",
+      "category": "Eletroportáteis",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ep-7",
+      "name": "Espremedor de frutas",
+      "category": "Eletroportáteis",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ep-8",
+      "name": "Ventilador",
+      "category": "Eletroportáteis",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ep-9",
+      "name": "Pipoqueira elétrica",
+      "category": "Eletroportáteis",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ot-1",
+      "name": "Caixa térmica",
+      "category": "Outros itens para casa",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ot-2",
+      "name": "Caixa organizadora",
+      "category": "Outros itens para casa",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ot-3",
+      "name": "Jogo de tapetes",
+      "category": "Outros itens para casa",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ot-4",
+      "name": "Cortina blackout",
+      "category": "Outros itens para casa",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ot-5",
+      "name": "Bandeija de café da manhã",
+      "category": "Outros itens para casa",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ot-6",
+      "name": "Relógio de parede",
+      "category": "Outros itens para casa",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ot-7",
+      "name": "Capa para sofá",
+      "category": "Outros itens para casa",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ot-8",
+      "name": "Cadeira de praia",
+      "category": "Outros itens para casa",
+      "totalQuantity": 2,
+      "reservations": []
+    },
+    {
+      "id": "ot-9",
+      "name": "Colchão inflável solteiro",
+      "category": "Outros itens para casa",
+      "totalQuantity": 1,
+      "reservations": []
+    },
+    {
+      "id": "ot-10",
+      "name": "Gaveteiro 3 gavetas",
+      "category": "Outros itens para casa",
+      "totalQuantity": 1,
+      "reservations": []
+    }
+  ],
+  "rsvps": []
+}
