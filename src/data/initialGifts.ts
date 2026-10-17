@@ -11,7 +11,7 @@ export const initialEventConfig: EventConfig = {
   pixName: 'Karine',
   pixCity: 'FORTALEZA',
   notes: '🍲 Comida: Teremos uma feijoada deliciosa por minha conta!\n🍻 Bebidas: Cada pessoa pode trazer sua bebida de preferência (teremos freezer liberado para gelar).\n🏊‍♀️ Lazer: Nossa festa terá piscina! Traga roupa de banho e venha se divertir!',
-  adminPin: '1234',
+  adminPin: '281463',
 };
 
 export const initialGiftsList: Omit<GiftItem, 'reservations'>[] = [

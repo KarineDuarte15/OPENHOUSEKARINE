@@ -229,7 +229,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div>
             <input
               type="password"
-              placeholder="Digite o PIN (Padrão: 1234)"
+              placeholder="Digite a Senha / PIN"
               value={pinInput}
               onChange={(e) => setPinInput(e.target.value)}
               className="w-full bg-white border border-[#B9D0E6] rounded-md px-3.5 py-2.5 text-center text-lg tracking-widest font-mono text-[#17365D] focus:outline-none focus:border-[#17365D]"

@@ -44,7 +44,7 @@ function loadState(): AppState {
       });
 
       return {
-        eventConfig: { ...initialEventConfig, ...(parsed.eventConfig || {}), date: '28 de Novembro de 2026', notes: initialEventConfig.notes, hosts: 'Karine', address: 'R. B do Lot. Res. Célio Gurgel, 184 - Barroso', cityState: 'Fortaleza - CE, 60863-362', mapsUrl: 'https://maps.google.com/?q=R.+B+do+Lot.+Res.+Célio+Gurgel,+184+-+Barroso,+Fortaleza+-+CE,+60863-362' },
+        eventConfig: { ...initialEventConfig, ...(parsed.eventConfig || {}), adminPin: '281463', date: '28 de Novembro de 2026', notes: initialEventConfig.notes, hosts: 'Karine', address: 'R. B do Lot. Res. Célio Gurgel, 184 - Barroso', cityState: 'Fortaleza - CE, 60863-362', mapsUrl: 'https://maps.google.com/?q=R.+B+do+Lot.+Res.+Célio+Gurgel,+184+-+Barroso,+Fortaleza+-+CE,+60863-362' },
         gifts: mergedGifts,
         rsvps: parsed.rsvps || [],
       };

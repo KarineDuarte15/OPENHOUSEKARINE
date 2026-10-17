@@ -14,7 +14,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('invitation');
   const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
-  const [adminPinToken, setAdminPinToken] = useState<string>('1234');
+  const [adminPinToken, setAdminPinToken] = useState<string>('281463');
 
   const [state, setState] = useState<AppState>({
     eventConfig: initialEventConfig,
