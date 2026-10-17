@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --navy: #17365D;
+    --classic-blue: #315C8C;
+    --soft-blue: #7399C2;
+    --pastel-blue: #B9D0E6;
+    --mist-blue: #E5EEF6;
+    --vintage-paper: #F6F2E9;
+    --paper-ivory: #FCFAF5;
+  }
+
+  body {
+    background-color: var(--vintage-paper);
+    color: var(--navy);
+    font-family: 'Lora', 'Cormorant Garamond', Georgia, serif;
+    background-image: radial-gradient(rgba(23, 54, 93, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.font-cursive {
+  font-family: 'Great Vibes', cursive;
+}
+
+.font-serif-vintage {
+  font-family: 'Cormorant Garamond', 'Lora', Georgia, serif;
+}
+
+.font-sans-clean {
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+}
+
+/* Vintage paper card effect */
+.vintage-card {
+  background-color: #FCFAF5;
+  border: 1px solid #B9D0E6;
+  box-shadow: 0 4px 15px -2px rgba(23, 54, 93, 0.05);
+  border-radius: 8px;
+  position: relative;
+}
+
+.vintage-card::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed rgba(115, 153, 194, 0.3);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Fine vintage divider */
+.vintage-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.vintage-divider::before,
+.vintage-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #7399C2, transparent);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #E5EEF6;
+}
+::-webkit-scrollbar-thumb {
+  background: #7399C2;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #315C8C;
+}

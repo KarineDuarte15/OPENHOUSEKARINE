@@ -1,0 +1,6 @@
+{
+  "name": "Open House da Karine",
+  "description": "Convite digital vintage e interativo para o Open House da Karine com lista de presentes, Pix e confirmação de presença.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
