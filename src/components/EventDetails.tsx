@@ -93,7 +93,7 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ eventConfig }) => {
           <div className="max-w-2xl mx-auto bg-[#E5EEF6] border border-[#B9D0E6] p-6 rounded-lg text-left my-8">
             <h4 className="font-sans-clean text-xs font-bold uppercase tracking-wider text-[#17365D] mb-2 flex items-center gap-2">
               <Info className="w-4 h-4 text-[#315C8C]" />
-              Orientações dos Anfitriões
+              Orientações da Anfitriã
             </h4>
             <p className="font-serif-vintage text-base text-[#17365D] leading-relaxed whitespace-pre-line">
               {eventConfig.notes}
@@ -104,7 +104,7 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ eventConfig }) => {
         {/* Final Warm Message */}
         <div className="mt-10 pt-6 border-t border-[#B9D0E6]/80 max-w-xl mx-auto">
           <p className="font-serif-vintage text-xl font-bold text-[#17365D] italic mb-3">
-            "Mal podemos esperar para abrir as portas do nosso novo lar e celebrar com você!"
+            "Mal posso esperar para abrir as portas do meu novo lar e celebrar com você!"
           </p>
 
           <div className="flex items-center justify-center gap-2 text-[#315C8C] font-serif-vintage italic text-lg font-semibold mt-4">

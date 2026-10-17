@@ -130,6 +130,78 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     window.print();
   };
 
+  const handleExportGiftsCSV = () => {
+    if (giftsGivenList.length === 0) {
+      alert('Nenhum presente foi reservado ainda para exportar.');
+      return;
+    }
+
+    const headers = [
+      'Nome do Convidado',
+      'Presente Escolhido',
+      'Categoria',
+      'Quantidade',
+      'Data da Escolha',
+      'Mensagem / Recadinho',
+      'Prazo de Entrega',
+      'Endereco de Entrega'
+    ];
+
+    const rows = giftsGivenList.map((item) => [
+      `"${item.guestName.replace(/"/g, '""')}"`,
+      `"${item.giftName.replace(/"/g, '""')}"`,
+      `"${item.category.replace(/"/g, '""')}"`,
+      item.count,
+      `"${new Date(item.date).toLocaleString('pt-BR')}"`,
+      `"${(item.note || '').replace(/"/g, '""')}"`,
+      '"Até 15/11/2026"',
+      `"${eventConfig.address.replace(/"/g, '""')}, ${eventConfig.cityState.replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Presentes_Open_House_Karine_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportRSVPsCSV = () => {
+    if (rsvps.length === 0) {
+      alert('Nenhuma confirmação registrada ainda para exportar.');
+      return;
+    }
+
+    const headers = [
+      'Nome Completo',
+      'Quantidade de Pessoas',
+      'Telefone',
+      'Mensagem',
+      'Data de Confirmacao'
+    ];
+
+    const rows = rsvps.map((rsvp) => [
+      `"${rsvp.fullName.replace(/"/g, '""')}"`,
+      rsvp.guestCount,
+      `"${(rsvp.phone || '').replace(/"/g, '""')}"`,
+      `"${(rsvp.message || '').replace(/"/g, '""')}"`,
+      `"${new Date(rsvp.createdAt).toLocaleString('pt-BR')}"`
+    ]);
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Lista_Presenca_Open_House_Karine_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (!isAdmin) {
     return (
       <div className="vintage-card max-w-md mx-auto my-12 p-8 bg-[#FCFAF5] border-2 border-[#17365D] text-center shadow-xl">
@@ -189,10 +261,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </h2>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleExportGiftsCSV}
+            className="bg-[#17365D] hover:bg-[#315C8C] text-white px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+            title="Exportar tabela formatada para abrir no Google Planilhas"
+          >
+            <FileText className="w-4 h-4 text-[#B9D0E6]" />
+            Exportar para Google Planilhas (.CSV)
+          </button>
+
           <button
             onClick={handlePrint}
-            className="bg-[#E5EEF6] hover:bg-[#B9D0E6] text-[#17365D] border border-[#315C8C] px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors flex items-center gap-1.5"
+            className="bg-[#E5EEF6] hover:bg-[#B9D0E6] text-[#17365D] border border-[#315C8C] px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors flex items-center gap-1.5 cursor-pointer"
             title="Imprimir relatório de presentes"
           >
             <Printer className="w-4 h-4 text-[#315C8C]" />
@@ -201,7 +282,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button
             onClick={onLogout}
-            className="bg-[#FCFAF5] hover:bg-[#E5EEF6] text-[#315C8C] border border-[#B9D0E6] px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors"
+            className="bg-[#FCFAF5] hover:bg-[#E5EEF6] text-[#315C8C] border border-[#B9D0E6] px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors cursor-pointer"
           >
             Sair
           </button>
@@ -402,9 +483,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* TAB 2: RSVPs List */}
       {activeTab === 'rsvps' && (
         <div className="space-y-4">
-          <h3 className="font-serif-vintage text-2xl font-bold text-[#17365D]">
-            Lista de Presenças Confirmadas (RSVP)
-          </h3>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#E5EEF6] p-4 rounded-lg border border-[#B9D0E6]">
+            <div>
+              <h3 className="font-serif-vintage text-2xl font-bold text-[#17365D]">
+                Lista de Presenças Confirmadas (RSVP)
+              </h3>
+              <p className="text-xs font-sans-clean text-[#315C8C]">
+                Total de {totalConfirmedGuests} pessoas confirmadas em {rsvps.length} resposta(s).
+              </p>
+            </div>
+
+            {rsvps.length > 0 && (
+              <button
+                onClick={handleExportRSVPsCSV}
+                className="bg-[#17365D] hover:bg-[#315C8C] text-white px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                title="Exportar Lista de Presença para Google Planilhas"
+              >
+                <FileText className="w-4 h-4 text-[#B9D0E6]" />
+                Exportar Presenças (.CSV)
+              </button>
+            )}
+          </div>
 
           {rsvps.length === 0 ? (
             <p className="text-sm font-serif-vintage text-[#315C8C] italic">

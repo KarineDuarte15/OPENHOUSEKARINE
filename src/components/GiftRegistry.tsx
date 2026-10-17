@@ -115,6 +115,14 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
         <p className="font-serif-vintage text-lg text-[#17365D] leading-relaxed">
           Preparei esta lista com muito carinho. Escolha um presente que combine com você e me ajude a transformar minha casa em um lar ainda mais especial. Sua presença também é um presente!
         </p>
+
+        {/* Delivery Deadline Notice Box */}
+        <div className="mt-4 inline-flex items-center gap-2 bg-[#E5EEF6] border border-[#315C8C]/50 rounded-lg p-3 text-xs font-sans-clean font-semibold text-[#17365D] text-left">
+          <span className="text-base">📦</span>
+          <div>
+            <strong className="text-[#315C8C]">Prazo de Entrega:</strong> Entregar o presente <strong>até o dia 15 de Novembro</strong> no endereço: <em>R. B do Lot. Res. Célio Gurgel, 184 - Barroso, Fortaleza - CE</em>.
+          </div>
+        </div>
         <VintageFlourishDivider />
       </div>
 
@@ -225,7 +233,7 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
               <X className="w-5 h-5" />
             </button>
 
-            <div className="text-center mb-6">
+            <div className="text-center mb-4">
               <span className="text-xs font-sans-clean font-semibold uppercase tracking-wider text-[#315C8C]">
                 Confirmar Presente
               </span>
@@ -235,6 +243,13 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
               <p className="text-xs font-sans-clean text-[#7399C2] mt-0.5">
                 Categoria: {activeGift.category}
               </p>
+
+              {/* Delivery Deadline Info Box in Modal */}
+              <div className="mt-3 bg-[#E5EEF6] border border-[#B9D0E6] p-2.5 rounded text-left text-xs font-sans-clean text-[#17365D]">
+                <strong>📍 Endereço para entrega (Até o dia 15 de Novembro):</strong>
+                <br />
+                R. B do Lot. Res. Célio Gurgel, 184 - Barroso, Fortaleza - CE, 60863-362
+              </div>
             </div>
 
             {successMsg ? (
