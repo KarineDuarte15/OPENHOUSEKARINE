@@ -35,12 +35,14 @@ export interface EventConfig {
   pixCity: string;
   notes: string;
   adminPin: string;
+  whatsappNumber?: string;
 }
 
 export interface RSVP {
   id: string;
   fullName: string;
   guestCount: number;
+  companions?: string;
   phone?: string;
   message?: string;
   createdAt: string;

@@ -17,7 +17,8 @@ import {
   Heart,
   Calendar,
   MessageCircle,
-  FileText
+  FileText,
+  RefreshCw,
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -25,6 +26,8 @@ interface AdminDashboardProps {
   gifts: GiftItem[];
   rsvps: RSVP[];
   isAdmin: boolean;
+  lastUpdated: Date | null;
+  onRefreshState: () => Promise<void>;
   onLogin: (pin: string) => Promise<boolean>;
   onLogout: () => void;
   onUpdateEventConfig: (newConfig: Partial<EventConfig>) => Promise<boolean>;
@@ -37,6 +40,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   gifts,
   rsvps,
   isAdmin,
+  lastUpdated,
+  onRefreshState,
   onLogin,
   onLogout,
   onUpdateEventConfig,
@@ -47,6 +52,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [loginError, setLoginError] = useState('');
   const [activeTab, setActiveTab] = useState<'received_gifts' | 'all_gifts' | 'rsvps' | 'config'>('received_gifts');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Form edit states
   const [formData, setFormData] = useState<EventConfig>(eventConfig);
@@ -56,6 +62,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   useEffect(() => {
     setFormData(eventConfig);
   }, [eventConfig]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      onRefreshState();
+    }
+  }, [isAdmin, activeTab, onRefreshState]);
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    await onRefreshState();
+    setTimeout(() => setIsRefreshing(false), 350);
+  };
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,7 +176,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       item.count,
       `"${new Date(item.date).toLocaleString('pt-BR')}"`,
       `"${(item.note || '').replace(/"/g, '""')}"`,
-      '"Até 15/11/2026"',
+      '"Até 27/11/2026"',
       `"${eventConfig.address.replace(/"/g, '""')}, ${eventConfig.cityState.replace(/"/g, '""')}"`
     ]);
 
@@ -175,13 +193,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const handleExportRSVPsCSV = () => {
     if (rsvps.length === 0) {
-      alert('Nenhuma confirmação registrada ainda para exportar.');
       return;
     }
 
     const headers = [
       'Nome Completo',
       'Quantidade de Pessoas',
+      'Acompanhantes',
       'Telefone',
       'Mensagem',
       'Data de Confirmacao'
@@ -190,6 +208,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     const rows = rsvps.map((rsvp) => [
       `"${rsvp.fullName.replace(/"/g, '""')}"`,
       rsvp.guestCount,
+      `"${(rsvp.companions || '').replace(/"/g, '""')}"`,
       `"${(rsvp.phone || '').replace(/"/g, '""')}"`,
       `"${(rsvp.message || '').replace(/"/g, '""')}"`,
       `"${new Date(rsvp.createdAt).toLocaleString('pt-BR')}"`
@@ -263,19 +282,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <h2 className="font-serif-vintage text-3xl font-bold text-[#17365D]">
             Relatório de Presentes & Convidados
           </h2>
+          {lastUpdated && (
+            <p className="text-[11px] font-sans-clean text-[#7399C2] mt-0.5">
+              Atualização automática ativa • Última sincronização às{' '}
+              {lastUpdated.toLocaleTimeString('pt-BR')}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <button
+            type="button"
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-70"
+            title="Atualizar lista de presentes e confirmações agora"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Atualizando...' : 'Atualizar'}
+          </button>
+
+          <button
+            type="button"
             onClick={handleExportGiftsCSV}
             className="bg-[#17365D] hover:bg-[#315C8C] text-white px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
             title="Exportar tabela formatada para abrir no Google Planilhas"
           >
             <FileText className="w-4 h-4 text-[#B9D0E6]" />
-            Exportar para Google Planilhas (.CSV)
+            Exportar (.CSV)
           </button>
 
           <button
+            type="button"
             onClick={handlePrint}
             className="bg-[#E5EEF6] hover:bg-[#B9D0E6] text-[#17365D] border border-[#315C8C] px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors flex items-center gap-1.5 cursor-pointer"
             title="Imprimir relatório de presentes"
@@ -285,6 +323,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
 
           <button
+            type="button"
             onClick={onLogout}
             className="bg-[#FCFAF5] hover:bg-[#E5EEF6] text-[#315C8C] border border-[#B9D0E6] px-3.5 py-2 rounded-md text-xs font-sans-clean font-semibold uppercase transition-colors cursor-pointer"
           >
@@ -301,10 +340,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             Presentes Escolhidos
           </div>
           <span className="font-serif-vintage text-3xl font-bold text-white">
-            {reservedGiftsCount} <span className="text-sm font-normal text-[#B9D0E6]">itens dados</span>
+            {reservedGiftsCount} <span className="text-sm font-normal text-[#B9D0E6]">de {totalGiftsCount} itens</span>
           </span>
           <p className="text-xs text-[#B9D0E6] mt-1">
-            {giftsGivenList.length} presenteador(es) até agora
+            {totalGiftsCount - reservedGiftsCount} ainda disponíveis
           </p>
         </div>
 
@@ -520,9 +559,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <tr className="bg-[#17365D] text-white">
                     <th className="p-3">Nome do Convidado</th>
                     <th className="p-3 text-center">Pessoas</th>
+                    <th className="p-3">Acompanhantes</th>
                     <th className="p-3">Telefone</th>
                     <th className="p-3">Mensagem</th>
-                    <th className="p-3">Data de Confirmação</th>
+                    <th className="p-3">Data</th>
                     <th className="p-3 text-right">Ação</th>
                   </tr>
                 </thead>
@@ -531,6 +571,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <tr key={rsvp.id} className="hover:bg-[#E5EEF6]/40">
                       <td className="p-3 font-bold text-[#17365D]">{rsvp.fullName}</td>
                       <td className="p-3 text-center font-mono font-bold text-[#17365D]">{rsvp.guestCount}</td>
+                      <td className="p-3 text-xs text-[#17365D]">{rsvp.companions || '—'}</td>
                       <td className="p-3 text-[#315C8C]">{rsvp.phone || '—'}</td>
                       <td className="p-3 text-xs italic text-[#17365D]">{rsvp.message || '—'}</td>
                       <td className="p-3 text-xs text-[#7399C2] font-mono">
@@ -542,8 +583,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       </td>
                       <td className="p-3 text-right">
                         <button
+                          type="button"
                           onClick={() => onDeleteRSVP(rsvp.id)}
-                          className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50"
+                          className="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 cursor-pointer"
                           title="Excluir Confirmação"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -582,8 +624,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <h4 className="font-serif-vintage text-lg font-bold text-[#17365D]">
                       {gift.name}
                     </h4>
-                    <p className="text-xs text-[#315C8C] font-mono">
-                      {reserved} de {gift.totalQuantity} unidades reservadas
+                    <p className="text-xs text-[#315C8C] font-sans-clean">
+                      {reserved > 0 ? 'Indisponível — Presente escolhido' : 'Disponível para escolha'}
                     </p>
                   </div>
 
@@ -755,6 +797,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 className="w-full bg-white border border-[#B9D0E6] rounded px-3 py-2 text-sm text-[#17365D]"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-sans-clean font-semibold uppercase text-[#17365D] mb-1">
+              WhatsApp para Confirmação (com DDD)
+            </label>
+            <input
+              type="text"
+              value={formData.whatsappNumber || '5585997004361'}
+              onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
+              className="w-full bg-white border border-[#B9D0E6] rounded px-3 py-2 text-sm font-mono text-[#17365D]"
+            />
           </div>
 
           <div>

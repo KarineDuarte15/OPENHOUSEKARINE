@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { initialEventConfig, initialGiftsList } from './src/data/initialGifts';
-import { AppState, GiftItem, RSVP, EventConfig } from './src/types';
+import { AppState, GiftItem, RSVP } from './src/types';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,6 +15,20 @@ app.use(express.json());
 
 const DATA_FILE = path.join(__dirname, 'store.json');
 
+// Active Server-Sent Events clients for real-time dashboard & gift updates
+const sseClients = new Set<express.Response>();
+
+function broadcastState(state: AppState) {
+  const payload = `data: ${JSON.stringify(state)}\n\n`;
+  for (const client of sseClients) {
+    try {
+      client.write(payload);
+    } catch {
+      sseClients.delete(client);
+    }
+  }
+}
+
 // Helper to load or initialize state
 function loadState(): AppState {
   try {
@@ -22,7 +36,7 @@ function loadState(): AppState {
       const data = fs.readFileSync(DATA_FILE, 'utf-8');
       const parsed = JSON.parse(data);
 
-      // Ensure all gifts from initial list exist in store (merge new ones if missing)
+      // Ensure all gifts from initial list exist in store (merge existing reservations)
       const existingGiftsMap = new Map<string, GiftItem>(
         (parsed.gifts || []).map((g: GiftItem) => [g.id, g])
       );
@@ -33,12 +47,13 @@ function loadState(): AppState {
           return {
             ...init,
             ...existing,
-            totalQuantity: init.totalQuantity, // retain prescribed count
+            totalQuantity: 1, // Each gift becomes unavailable once chosen by a guest
             reservations: existing.reservations || [],
           };
         }
         return {
           ...init,
+          totalQuantity: 1,
           reservations: [],
         };
       });
@@ -49,11 +64,27 @@ function loadState(): AppState {
           ? initialEventConfig.time
           : parsedConfig.time;
 
-      return {
-        eventConfig: { ...initialEventConfig, ...parsedConfig, time: timeValue, adminPin: '281463', date: '28 de Novembro de 2026', notes: initialEventConfig.notes, hosts: 'Karine', address: 'R. B do Lot. Res. Célio Gurgel, 184 - Barroso', cityState: 'Fortaleza - CE, 60863-362', mapsUrl: 'https://maps.google.com/?q=R.+B+do+Lot.+Res.+Célio+Gurgel,+184+-+Barroso,+Fortaleza+-+CE,+60863-362' },
+      const loadedState: AppState = {
+        eventConfig: {
+          ...initialEventConfig,
+          ...parsedConfig,
+          time: timeValue,
+          whatsappNumber: parsedConfig.whatsappNumber || initialEventConfig.whatsappNumber,
+          adminPin: '281463',
+          date: '28 de Novembro de 2026',
+          notes: initialEventConfig.notes,
+          hosts: 'Karine',
+          address: 'R. B do Lot. Res. Célio Gurgel, 184 - Barroso',
+          cityState: 'Fortaleza - CE, 60863-362',
+          mapsUrl:
+            'https://maps.google.com/?q=R.+B+do+Lot.+Res.+Célio+Gurgel,+184+-+Barroso,+Fortaleza+-+CE,+60863-362',
+        },
         gifts: mergedGifts,
         rsvps: parsed.rsvps || [],
       };
+
+      saveState(loadedState);
+      return loadedState;
     }
   } catch (err) {
     console.error('Error reading store.json, creating initial state:', err);
@@ -62,6 +93,7 @@ function loadState(): AppState {
   // Initial State Creation
   const initialGifts: GiftItem[] = initialGiftsList.map((g) => ({
     ...g,
+    totalQuantity: 1,
     reservations: [],
   }));
 
@@ -87,21 +119,50 @@ let appState = loadState();
 
 // --- API ROUTES ---
 
-// GET full state
+// Real-time SSE stream for instant updates across guests and Admin Dashboard
+app.get('/api/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders?.();
+
+  // Send immediate snapshot
+  res.write(`data: ${JSON.stringify(appState)}\n\n`);
+  sseClients.add(res);
+
+  const heartbeat = setInterval(() => {
+    try {
+      res.write(': ping\n\n');
+    } catch {
+      clearInterval(heartbeat);
+      sseClients.delete(res);
+    }
+  }, 25000);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    sseClients.delete(res);
+  });
+});
+
+// GET full state (always uncached)
 app.get('/api/state', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   res.json(appState);
 });
 
-// Reserve gift
+// Reserve gift (locks item so no other guest can select it)
 app.post('/api/gifts/:id/reserve', (req, res) => {
   const { id } = req.params;
-  const { guestName, count = 1, note } = req.body;
+  const { guestName, note } = req.body;
 
-  if (!guestName || !guestName.trim()) {
+  if (!guestName || !String(guestName).trim()) {
     return res.status(400).json({ error: 'Por favor, informe seu nome.' });
   }
 
-  const requestedCount = Math.max(1, parseInt(count, 10) || 1);
   const giftIndex = appState.gifts.findIndex((g) => g.id === id);
 
   if (giftIndex === -1) {
@@ -109,26 +170,26 @@ app.post('/api/gifts/:id/reserve', (req, res) => {
   }
 
   const gift = appState.gifts[giftIndex];
-  const currentReserved = gift.reservations.reduce((acc, r) => acc + r.reservedCount, 0);
-  const available = gift.totalQuantity - currentReserved;
+  const alreadyReserved = gift.reservations.length > 0;
 
-  if (available < requestedCount) {
-    return res.status(400).json({
-      error: `Infelizmente restam apenas ${available} unidade(s) disponível(is) para este item.`,
-      available,
+  if (alreadyReserved) {
+    return res.status(409).json({
+      error: 'Este presente já foi escolhido por outro convidado e agora está indisponível.',
+      state: appState,
     });
   }
 
   const newReservation = {
     id: `res-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    guestName: guestName.trim(),
-    reservedCount: requestedCount,
+    guestName: String(guestName).trim(),
+    reservedCount: 1,
     reservedAt: new Date().toISOString(),
-    note: note ? note.trim() : undefined,
+    note: note ? String(note).trim() : undefined,
   };
 
   gift.reservations.push(newReservation);
   saveState(appState);
+  broadcastState(appState);
 
   return res.json({
     message: 'Presente escolhido com sucesso! Muito obrigado pelo carinho.',
@@ -154,15 +215,16 @@ app.delete('/api/gifts/:id/reservations/:reservationId', (req, res) => {
 
   gift.reservations = gift.reservations.filter((r) => r.id !== reservationId);
   saveState(appState);
+  broadcastState(appState);
 
   res.json({ message: 'Reserva removida com sucesso.', gift, state: appState });
 });
 
 // RSVP Submission
 app.post('/api/rsvp', (req, res) => {
-  const { fullName, guestCount, phone, message } = req.body;
+  const { fullName, guestCount, companions, phone, message } = req.body;
 
-  if (!fullName || !fullName.trim()) {
+  if (!fullName || !String(fullName).trim()) {
     return res.status(400).json({ error: 'O nome completo é obrigatório.' });
   }
 
@@ -170,15 +232,17 @@ app.post('/api/rsvp', (req, res) => {
 
   const newRsvp: RSVP = {
     id: `rsvp-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    fullName: fullName.trim(),
+    fullName: String(fullName).trim(),
     guestCount: count,
-    phone: phone ? phone.trim() : '',
-    message: message ? message.trim() : '',
+    companions: companions ? String(companions).trim() : '',
+    phone: phone ? String(phone).trim() : '',
+    message: message ? String(message).trim() : '',
     createdAt: new Date().toISOString(),
   };
 
   appState.rsvps.unshift(newRsvp);
   saveState(appState);
+  broadcastState(appState);
 
   res.json({
     message: 'Presença confirmada! Estamos muito felizes em compartilhar esse momento com você.',
@@ -198,6 +262,7 @@ app.delete('/api/rsvp/:id', (req, res) => {
   const { id } = req.params;
   appState.rsvps = appState.rsvps.filter((r) => r.id !== id);
   saveState(appState);
+  broadcastState(appState);
 
   res.json({ message: 'Confirmação removida.', state: appState });
 });
@@ -218,7 +283,12 @@ app.put('/api/event', (req, res) => {
   };
 
   saveState(appState);
-  res.json({ message: 'Dados do evento atualizados com sucesso.', eventConfig: appState.eventConfig, state: appState });
+  broadcastState(appState);
+  res.json({
+    message: 'Dados do evento atualizados com sucesso.',
+    eventConfig: appState.eventConfig,
+    state: appState,
+  });
 });
 
 // Admin Login Check

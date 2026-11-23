@@ -1,12 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { GiftItem, GiftCategory } from '../types';
+import { GiftItem, GiftCategory, EventConfig } from '../types';
 import { GiftCard } from './GiftCard';
 import { VintageFlourishDivider } from './VintageOrnaments';
-import { Search, Filter, Gift, X, CheckCircle2, HeartHandshake, AlertCircle } from 'lucide-react';
+import { buildWhatsAppUrl } from '../utils/whatsapp';
+import { Search, Gift, X, CheckCircle2, AlertCircle, MessageCircle } from 'lucide-react';
 
 interface GiftRegistryProps {
   gifts: GiftItem[];
-  onReserveGift: (giftId: string, guestName: string, count: number, note?: string) => Promise<boolean>;
+  eventConfig: EventConfig;
+  onReserveGift: (giftId: string, guestName: string, count: number, note?: string) => Promise<{ ok: boolean; error?: string }>;
+  onRefreshState?: () => Promise<void>;
 }
 
 const ALL_CATEGORIES: (GiftCategory | 'Todas')[] = [
@@ -22,28 +25,40 @@ const ALL_CATEGORIES: (GiftCategory | 'Todas')[] = [
 
 type StatusFilter = 'todos' | 'disponiveis' | 'escolhidos';
 
-export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift }) => {
+export const GiftRegistry: React.FC<GiftRegistryProps> = ({
+  gifts,
+  eventConfig,
+  onReserveGift,
+  onRefreshState,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<GiftCategory | 'Todas'>('Todas');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('todos');
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Modal state
   const [activeGift, setActiveGift] = useState<GiftItem | null>(null);
   const [guestName, setGuestName] = useState('');
-  const [count, setCount] = useState(1);
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [confirmedGiftDetails, setConfirmedGiftDetails] = useState<{
+    giftName: string;
+    guestName: string;
+    note?: string;
+  } | null>(null);
+
+  const availableTotal = useMemo(
+    () => gifts.filter((g) => g.reservations.length === 0).length,
+    [gifts]
+  );
+  const chosenTotal = gifts.length - availableTotal;
 
   const filteredGifts = useMemo(() => {
     return gifts.filter((gift) => {
-      // Category check
       if (selectedCategory !== 'Todas' && gift.category !== selectedCategory) {
         return false;
       }
 
-      // Search query
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const matchesName = gift.name.toLowerCase().includes(query);
@@ -51,10 +66,7 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
         if (!matchesName && !matchesCat) return false;
       }
 
-      // Status check
-      const reservedCount = gift.reservations.reduce((acc, r) => acc + r.reservedCount, 0);
-      const isAvailable = gift.totalQuantity - reservedCount > 0;
-
+      const isAvailable = gift.reservations.length === 0;
       if (statusFilter === 'disponiveis' && !isAvailable) return false;
       if (statusFilter === 'escolhidos' && isAvailable) return false;
 
@@ -63,18 +75,19 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
   }, [gifts, selectedCategory, searchQuery, statusFilter]);
 
   const handleOpenModal = (gift: GiftItem) => {
+    if (gift.reservations.length > 0) return;
     setActiveGift(gift);
     setGuestName('');
-    setCount(1);
     setNote('');
     setErrorMsg('');
-    setSuccessMsg('');
+    setConfirmedGiftDetails(null);
+    onRefreshState?.();
   };
 
   const handleCloseModal = () => {
     setActiveGift(null);
     setErrorMsg('');
-    setSuccessMsg('');
+    setConfirmedGiftDetails(null);
   };
 
   const handleSubmitReservation = async (e: React.FormEvent) => {
@@ -89,18 +102,37 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
     setIsSubmitting(true);
     setErrorMsg('');
 
-    const success = await onReserveGift(activeGift.id, guestName, count, note);
+    const result = await onReserveGift(activeGift.id, guestName.trim(), 1, note.trim() || undefined);
     setIsSubmitting(false);
 
-    if (success) {
-      setSuccessMsg(`Obrigado, ${guestName}! Seu presente foi registrado com muito carinho.`);
-      setTimeout(() => {
-        handleCloseModal();
-      }, 2000);
+    if (result.ok) {
+      setConfirmedGiftDetails({
+        giftName: activeGift.name,
+        guestName: guestName.trim(),
+        note: note.trim() || undefined,
+      });
     } else {
-      setErrorMsg('Ops! Não foi possível concluir a escolha. O item pode já ter sido reservado por outro convidado.');
+      setErrorMsg(
+        result.error ||
+          'Ops! Este presente já foi escolhido por outro convidado e agora está indisponível.'
+      );
     }
   };
+
+  const giftWhatsAppUrl = confirmedGiftDetails
+    ? buildWhatsAppUrl(
+        eventConfig.whatsappNumber,
+        [
+          `Olá ${eventConfig.hosts}! Escolhi um presente na sua lista do Open House! 🎁`,
+          `*Convidado:* ${confirmedGiftDetails.guestName}`,
+          `*Presente escolhido:* ${confirmedGiftDetails.giftName}`,
+          confirmedGiftDetails.note ? `*Recadinho:* ${confirmedGiftDetails.note}` : null,
+          `Entregarei até o dia 27 de Novembro!`,
+        ]
+          .filter(Boolean)
+          .join('\n')
+      )
+    : '';
 
   return (
     <section id="gifts" className="py-12 px-4 max-w-6xl mx-auto">
@@ -113,14 +145,19 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
           Um mimo para meu novo lar
         </h2>
         <p className="font-serif-vintage text-lg text-[#17365D] leading-relaxed">
-          Preparei esta lista com muito carinho. Escolha um presente que combine com você e me ajude a transformar minha casa em um lar ainda mais especial. Sua presença também é um presente!
+          Preparei esta lista com muito carinho. Escolha um presente que combine com você — assim que você confirmar, ele fica automaticamente indisponível para outros convidados. Sua presença também é um presente!
         </p>
 
         {/* Delivery Deadline Notice Box */}
         <div className="mt-4 inline-flex items-center gap-2 bg-[#E5EEF6] border border-[#315C8C]/50 rounded-lg p-3 text-xs font-sans-clean font-semibold text-[#17365D] text-left">
           <span className="text-base">📦</span>
           <div>
-            <strong className="text-[#315C8C]">Prazo de Entrega:</strong> Entregar o presente <strong>até o dia 15 de Novembro</strong> no endereço: <em>R. B do Lot. Res. Célio Gurgel, 184 - Barroso, Fortaleza - CE</em>.
+            <strong className="text-[#315C8C]">Prazo de Entrega:</strong> Entregar o presente{' '}
+            <strong>até o dia 27 de Novembro</strong> no endereço:{' '}
+            <em>
+              {eventConfig.address}, {eventConfig.cityState}
+            </em>
+            .
           </div>
         </div>
         <VintageFlourishDivider />
@@ -140,6 +177,7 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
           />
           {searchQuery && (
             <button
+              type="button"
               onClick={() => setSearchQuery('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7399C2] hover:text-[#17365D]"
             >
@@ -154,34 +192,37 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
             Exibir:
           </span>
           <button
+            type="button"
             onClick={() => setStatusFilter('todos')}
-            className={`px-3 py-1.5 text-xs font-sans-clean font-medium rounded-md transition-colors shrink-0 ${
+            className={`px-3 py-1.5 text-xs font-sans-clean font-medium rounded-md transition-colors shrink-0 cursor-pointer ${
               statusFilter === 'todos'
                 ? 'bg-[#17365D] text-white'
                 : 'bg-[#E5EEF6] text-[#315C8C] hover:bg-[#B9D0E6]'
             }`}
           >
-            Todos os presentes
+            Todos ({gifts.length})
           </button>
           <button
+            type="button"
             onClick={() => setStatusFilter('disponiveis')}
-            className={`px-3 py-1.5 text-xs font-sans-clean font-medium rounded-md transition-colors shrink-0 ${
+            className={`px-3 py-1.5 text-xs font-sans-clean font-medium rounded-md transition-colors shrink-0 cursor-pointer ${
               statusFilter === 'disponiveis'
                 ? 'bg-[#17365D] text-white'
                 : 'bg-[#E5EEF6] text-[#315C8C] hover:bg-[#B9D0E6]'
             }`}
           >
-            Disponíveis
+            Disponíveis ({availableTotal})
           </button>
           <button
+            type="button"
             onClick={() => setStatusFilter('escolhidos')}
-            className={`px-3 py-1.5 text-xs font-sans-clean font-medium rounded-md transition-colors shrink-0 ${
+            className={`px-3 py-1.5 text-xs font-sans-clean font-medium rounded-md transition-colors shrink-0 cursor-pointer ${
               statusFilter === 'escolhidos'
                 ? 'bg-[#17365D] text-white'
                 : 'bg-[#E5EEF6] text-[#315C8C] hover:bg-[#B9D0E6]'
             }`}
           >
-            Já escolhidos
+            Já escolhidos ({chosenTotal})
           </button>
         </div>
       </div>
@@ -190,6 +231,7 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
       <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-8 no-scrollbar scroll-smooth">
         {ALL_CATEGORIES.map((cat) => (
           <button
+            type="button"
             key={cat}
             onClick={() => setSelectedCategory(cat)}
             className={`px-4 py-2 text-xs font-sans-clean font-semibold rounded-full whitespace-nowrap transition-all shrink-0 cursor-pointer ${
@@ -227,8 +269,9 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#17365D]/60 backdrop-blur-xs animate-fadeIn">
           <div className="vintage-card max-w-lg w-full p-6 md:p-8 bg-[#FCFAF5] border-2 border-[#17365D] shadow-2xl relative">
             <button
+              type="button"
               onClick={handleCloseModal}
-              className="absolute top-4 right-4 text-[#315C8C] hover:text-[#17365D] p-1 rounded-full hover:bg-[#E5EEF6]"
+              className="absolute top-4 right-4 text-[#315C8C] hover:text-[#17365D] p-1 rounded-full hover:bg-[#E5EEF6] cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -246,19 +289,43 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
 
               {/* Delivery Deadline Info Box in Modal */}
               <div className="mt-3 bg-[#E5EEF6] border border-[#B9D0E6] p-2.5 rounded text-left text-xs font-sans-clean text-[#17365D]">
-                <strong>📍 Endereço para entrega (Até o dia 15 de Novembro):</strong>
+                <strong>📍 Endereço para entrega (Até o dia 27 de Novembro):</strong>
                 <br />
-                R. B do Lot. Res. Célio Gurgel, 184 - Barroso, Fortaleza - CE, 60863-362
+                {eventConfig.address}, {eventConfig.cityState}
               </div>
             </div>
 
-            {successMsg ? (
-              <div className="bg-[#E5EEF6] border border-[#315C8C] rounded-md p-6 text-center">
-                <CheckCircle2 className="w-12 h-12 text-[#17365D] mx-auto mb-3" />
-                <p className="font-serif-vintage text-lg font-bold text-[#17365D] mb-1">
-                  Reserva Confirmada!
-                </p>
-                <p className="font-serif-vintage text-sm text-[#315C8C]">{successMsg}</p>
+            {confirmedGiftDetails ? (
+              <div className="bg-[#E5EEF6] border border-[#315C8C] rounded-md p-6 text-center space-y-4">
+                <CheckCircle2 className="w-12 h-12 text-[#17365D] mx-auto" />
+                <div>
+                  <p className="font-serif-vintage text-xl font-bold text-[#17365D] mb-1">
+                    Presente Reservado com Sucesso!
+                  </p>
+                  <p className="font-serif-vintage text-sm text-[#315C8C]">
+                    Obrigado, <strong>{confirmedGiftDetails.guestName}</strong>! O item{' '}
+                    <strong>{confirmedGiftDetails.giftName}</strong> já está indisponível para outros convidados.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2.5 pt-2">
+                  <a
+                    href={giftWhatsAppUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-[#25D366] hover:bg-[#1ebe5d] text-white py-3 px-4 rounded-md text-xs font-sans-clean font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Confirmar escolha no WhatsApp da Karine
+                  </a>
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="w-full bg-white hover:bg-[#FCFAF5] text-[#17365D] border border-[#B9D0E6] py-2.5 rounded-md text-xs font-sans-clean font-semibold uppercase cursor-pointer"
+                  >
+                    Voltar para a lista
+                  </button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmitReservation} className="space-y-4">
@@ -283,33 +350,6 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
                   />
                 </div>
 
-                {/* Quantity selector if totalQuantity > 1 */}
-                {activeGift.totalQuantity - activeGift.reservations.reduce((a, b) => a + b.reservedCount, 0) > 1 && (
-                  <div>
-                    <label className="block text-xs font-sans-clean font-semibold text-[#17365D] uppercase mb-1">
-                      Quantidade a Presentear
-                    </label>
-                    <select
-                      value={count}
-                      onChange={(e) => setCount(parseInt(e.target.value, 10))}
-                      className="w-full bg-white border border-[#B9D0E6] rounded-md px-3 py-2 text-sm text-[#17365D] focus:outline-none focus:border-[#17365D]"
-                    >
-                      {Array.from(
-                        {
-                          length:
-                            activeGift.totalQuantity -
-                            activeGift.reservations.reduce((a, b) => a + b.reservedCount, 0),
-                        },
-                        (_, i) => i + 1
-                      ).map((n) => (
-                        <option key={n} value={n}>
-                          {n} unidade{n > 1 ? 's' : ''}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
                 <div>
                   <label className="block text-xs font-sans-clean font-semibold text-[#17365D] uppercase mb-1">
                     Recadinho carinhoso (opcional)
@@ -327,14 +367,14 @@ export const GiftRegistry: React.FC<GiftRegistryProps> = ({ gifts, onReserveGift
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="w-1/2 bg-[#E5EEF6] hover:bg-[#B9D0E6] text-[#17365D] py-2.5 rounded-md text-xs font-sans-clean font-semibold uppercase"
+                    className="w-1/2 bg-[#E5EEF6] hover:bg-[#B9D0E6] text-[#17365D] py-2.5 rounded-md text-xs font-sans-clean font-semibold uppercase cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-1/2 bg-[#17365D] hover:bg-[#315C8C] text-white py-2.5 rounded-md text-xs font-sans-clean font-semibold uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-1.5"
+                    className="w-1/2 bg-[#17365D] hover:bg-[#315C8C] text-white py-2.5 rounded-md text-xs font-sans-clean font-semibold uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     {isSubmitting ? 'Gravando...' : 'Confirmar Escolha'}
                   </button>

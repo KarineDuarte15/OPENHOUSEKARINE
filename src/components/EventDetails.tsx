@@ -1,7 +1,8 @@
 import React from 'react';
 import { EventConfig } from '../types';
 import { LocationPinIllustration, VintageFlourishDivider, HouseIllustration } from './VintageOrnaments';
-import { Calendar, Clock, MapPin, Navigation, Info, Heart } from 'lucide-react';
+import { Calendar, Clock, MapPin, Navigation, Info, Heart, MessageCircle } from 'lucide-react';
+import { buildWhatsAppUrl, formatWhatsAppDisplay } from '../utils/whatsapp';
 
 interface EventDetailsProps {
   eventConfig: EventConfig;
@@ -75,16 +76,29 @@ export const EventDetails: React.FC<EventDetailsProps> = ({ eventConfig }) => {
           </div>
         </div>
 
-        {/* Google Maps Button */}
-        <div className="mb-8">
+        {/* Google Maps & WhatsApp Buttons */}
+        <div className="mb-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
             href={eventConfig.mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#17365D] hover:bg-[#315C8C] text-white px-8 py-3.5 rounded-md font-sans-clean font-semibold text-xs uppercase tracking-widest transition-all shadow-md"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#17365D] hover:bg-[#315C8C] text-white px-7 py-3.5 rounded-md font-sans-clean font-semibold text-xs uppercase tracking-widest transition-all shadow-md"
           >
             <Navigation className="w-4 h-4 text-[#B9D0E6]" />
-            Abrir Localização no Google Maps
+            Abrir no Google Maps
+          </a>
+
+          <a
+            href={buildWhatsAppUrl(
+              eventConfig.whatsappNumber,
+              `Olá ${eventConfig.hosts}! Gostaria de confirmar minha presença no seu Open House! 🎉`
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white px-7 py-3.5 rounded-md font-sans-clean font-bold text-xs uppercase tracking-widest transition-all shadow-md"
+          >
+            <MessageCircle className="w-4 h-4" />
+            WhatsApp ({formatWhatsAppDisplay(eventConfig.whatsappNumber)})
           </a>
         </div>
 
