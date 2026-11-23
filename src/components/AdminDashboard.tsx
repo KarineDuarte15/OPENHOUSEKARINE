@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { EventConfig, GiftItem, RSVP } from '../types';
 import { getCategoryIcon } from './GiftCard';
 import {
@@ -52,6 +52,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [formData, setFormData] = useState<EventConfig>(eventConfig);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState('');
+
+  useEffect(() => {
+    setFormData(eventConfig);
+  }, [eventConfig]);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
